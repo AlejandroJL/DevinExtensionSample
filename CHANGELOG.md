@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.9] - 2026-07-09
+
+- Añadido el agente de ejemplo `update-sentinel` para verificar actualizaciones.
+
 ## [0.1.8] - 2026-07-09
 
 - El actualizador usa únicamente HTTPS y el manifiesto web configurado.

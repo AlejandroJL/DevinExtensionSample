@@ -2,7 +2,7 @@
   "name": "devin-global-customizations",
   "displayName": "Devin Global Customizations",
   "description": "Agentes y skills globales para Devin Desktop y VS Code.",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "publisher": "devin-global-customizations",
   "license": "MIT",
   "main": "./extension.js",
@@ -78,6 +78,9 @@
       },
       {
         "path": "./agents/random-orbit.agent.md"
+      },
+      {
+        "path": "./agents/update-sentinel.agent.md"
       }
     ],
     "chatSkills": [
