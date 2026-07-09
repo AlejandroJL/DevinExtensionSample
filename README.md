@@ -12,6 +12,10 @@ pueden estar disponibles en cualquier ventana o espacio de trabajo del IDE.
   `.devin/agents/<nombre>/AGENT.md`.
 - `.devin/skills/`: skills nativas de Devin, con formato
   `.devin/skills/<nombre>/SKILL.md`.
+- `.windsurf/skills/`: skills compatibles con Cascade, con formato
+  `.windsurf/skills/<nombre>/SKILL.md`.
+- `.windsurf/workflows/`: workflows de Cascade derivados de los agentes del
+  plugin.
 - `plugin.json`: manifiesto del plugin y punto de entrada para la instalación
   desde Git.
 - `scripts/validate.mjs`: validación local del manifiesto y de los recursos.
@@ -39,10 +43,18 @@ Agent Plugins; las actualizaciones deberán distribuirse como nuevas versiones
 de la extensión.
 
 Después de instalar el VSIX, usa la paleta de comandos y ejecuta
-`Devin: Install or Update Agents and Skills Globally`, o pulsa el botón
-`Devin Global` de la barra de estado. La extensión copiará `.devin/agents/` y
-`.devin/skills/` a `~/.config/devin/agents/` y `~/.config/devin/skills/`.
-En Windows usa `%APPDATA%/devin/agents/` y `%APPDATA%/devin/skills/`.
+`Devin/Cascade: Install or Update Global Customizations`, o pulsa el botón
+`Devin Global` de la barra de estado. La extensión instala las definiciones de
+Devin y Cascade en sus respectivas ubicaciones globales.
+
+Para Devin copia `.devin/agents/` y `.devin/skills/` a
+`~/.config/devin/agents/` y `~/.config/devin/skills/` en macOS/Linux. En
+Windows usa `%APPDATA%/devin/agents/` y `%APPDATA%/devin/skills/`.
+
+Para Cascade copia `.windsurf/skills/` a `~/.codeium/windsurf/skills/` y
+`.windsurf/workflows/` a `~/.codeium/windsurf/global_workflows/`. En Windows
+estas rutas se resuelven bajo el perfil del usuario, por ejemplo
+`C:\\Users\\<usuario>\\.codeium\\windsurf\\skills\\`.
 
 Por defecto, esa copia también se ejecuta automáticamente cuando la extensión
 se instala o se activa después de una actualización. Puedes desactivarla con
@@ -114,11 +126,10 @@ minúsculas, números y guiones.
 ## Alcance de Devin
 
 Devin puede descubrir las definiciones del proyecto bajo `.devin/agents/` y
-`.devin/skills/`. La instalación global usa `~/.config/devin/agents/` y
-`~/.config/devin/skills/` en macOS/Linux, y `%APPDATA%\\devin\\agents\\` y
-`%APPDATA%\\devin\\skills\\` en Windows; esas rutas no se escriben desde el
-repositorio. Para disponer de los recursos entre ventanas, instala el Agent
-Plugin en el perfil del IDE.
+`.devin/skills/`. Cascade descubre las skills bajo `.windsurf/skills/` y los
+workflows bajo `.windsurf/workflows/`. Para disponer de los recursos entre
+ventanas, instala el Agent Plugin y ejecuta la sincronización global de la
+extensión.
 
 ## Licencia
 

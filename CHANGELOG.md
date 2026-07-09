@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.0] - 2026-07-09
+
+- Añadida instalación global de skills compatibles con Cascade en
+  `~/.codeium/windsurf/skills`.
+- Añadida conversión de los agentes del plugin a workflows globales de Cascade
+  en `~/.codeium/windsurf/global_workflows`.
+- La instalación automática y manual sincroniza ahora Devin y Cascade.
+
 ## [0.1.10] - 2026-07-09
 
 - Añadida resolución de rutas globales compatible con macOS, Linux y Windows.

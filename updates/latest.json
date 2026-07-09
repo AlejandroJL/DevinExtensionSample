@@ -1,8 +1,8 @@
 {
   "name": "devin-global-customizations",
-  "version": "0.1.10",
-  "fileName": "devin-global-customizations-0.1.10.vsix",
-  "downloadUrl": "https://alejandrojl.github.io/DevinExtensionSample/updates/devin-global-customizations-0.1.10.vsix",
-  "sha256": "e35219ba588e2a63fb3a70946be6996cf565c5ce401afb1e8fa4f6b7d64ab6fb",
+  "version": "0.2.0",
+  "fileName": "devin-global-customizations-0.2.0.vsix",
+  "downloadUrl": "https://alejandrojl.github.io/DevinExtensionSample/updates/devin-global-customizations-0.2.0.vsix",
+  "sha256": "12c84b6b648abe1c6ffb4e0e577b7ef62da2f9fddb6fd637401228e3807e01be",
   "releaseNotesUrl": "https://alejandrojl.github.io/DevinExtensionSample/updates/"
 }

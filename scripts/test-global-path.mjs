@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import globalPath from '../src/global-path.js';
 
-const { getGlobalDevinRoot } = globalPath;
+const { getGlobalCascadeRoot, getGlobalDevinRoot } = globalPath;
 
 assert.equal(
   getGlobalDevinRoot({
@@ -40,6 +40,22 @@ assert.equal(
     pathApi: path.win32,
   }),
   'C:\\Users\\example\\AppData\\Roaming\\devin',
+);
+
+assert.equal(
+  getGlobalCascadeRoot({
+    homeDirectory: '/Users/example',
+    pathApi: path.posix,
+  }),
+  '/Users/example/.codeium/windsurf',
+);
+
+assert.equal(
+  getGlobalCascadeRoot({
+    homeDirectory: 'C:\\Users\\example',
+    pathApi: path.win32,
+  }),
+  'C:\\Users\\example\\.codeium\\windsurf',
 );
 
 console.log('Rutas globales de Devin válidas para macOS, Linux y Windows');

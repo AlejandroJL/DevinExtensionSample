@@ -137,6 +137,35 @@ function validateDevinSkillMirror() {
   }
 }
 
+function validateCascadeMirrors() {
+  const skillsPath = path.join(root, '.windsurf', 'skills');
+  const workflowsPath = path.join(root, '.windsurf', 'workflows');
+
+  if (!fs.existsSync(skillsPath)) {
+    errors.push('Falta la estructura Cascade .windsurf/skills');
+  }
+  if (!fs.existsSync(workflowsPath)) {
+    errors.push('Falta la estructura Cascade .windsurf/workflows');
+  }
+
+  for (const entry of fs.readdirSync(path.join(root, 'skills'), { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const expectedFile = path.join(skillsPath, entry.name, 'SKILL.md');
+    if (!fs.existsSync(expectedFile)) {
+      errors.push(`Falta la definición Cascade ${path.relative(root, expectedFile)}`);
+    }
+  }
+
+  for (const entry of fs.readdirSync(path.join(root, 'agents'))) {
+    if (!entry.endsWith('.agent.md')) continue;
+    const agentName = entry.replace(/\.agent\.md$/, '');
+    const expectedFile = path.join(workflowsPath, `${agentName}.md`);
+    if (!fs.existsSync(expectedFile)) {
+      errors.push(`Falta el workflow Cascade ${path.relative(root, expectedFile)}`);
+    }
+  }
+}
+
 function validateDevinAgentMirror() {
   const sourcePath = path.join(root, 'agents');
   const targetPath = path.join(root, '.devin', 'agents');
@@ -186,6 +215,7 @@ if (fs.existsSync(agentsPath)) {
 
 validateDevinAgentMirror();
 validateDevinSkillMirror();
+validateCascadeMirrors();
 
 if (errors.length > 0) {
   console.error(errors.map((error) => `- ${error}`).join('\n'));

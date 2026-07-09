@@ -23,4 +23,11 @@ function getGlobalDevinRoot({
   return pathApi.join(homeDirectory, '.config', 'devin');
 }
 
-module.exports = { getGlobalDevinRoot };
+function getGlobalCascadeRoot({
+  homeDirectory = os.homedir(),
+  pathApi = path,
+} = {}) {
+  return pathApi.join(homeDirectory, '.codeium', 'windsurf');
+}
+
+module.exports = { getGlobalCascadeRoot, getGlobalDevinRoot };

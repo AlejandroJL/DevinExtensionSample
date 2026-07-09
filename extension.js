@@ -2,7 +2,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vscode = require('vscode');
 const updater = require('./src/updater');
-const { getGlobalDevinRoot } = require('./src/global-path');
+const {
+  getGlobalCascadeRoot,
+  getGlobalDevinRoot,
+} = require('./src/global-path');
 
 const INSTALL_COMMAND = 'devinGlobalCustomizations.installGlobally';
 const OPEN_FOLDER_COMMAND = 'devinGlobalCustomizations.openGlobalFolder';
@@ -19,7 +22,7 @@ function copyDirectory(source, target) {
   fs.cpSync(source, target, { recursive: true, force: true });
 }
 
-function installGlobally(extensionRoot) {
+function installDevinGlobally(extensionRoot) {
   const sourceRoot = path.join(extensionRoot, '.devin');
   const targetRoot = getGlobalDevinRoot();
 
@@ -27,6 +30,26 @@ function installGlobally(extensionRoot) {
   copyDirectory(path.join(sourceRoot, 'skills'), path.join(targetRoot, 'skills'));
 
   return targetRoot;
+}
+
+function installCascadeGlobally(extensionRoot) {
+  const sourceRoot = path.join(extensionRoot, '.windsurf');
+  const targetRoot = getGlobalCascadeRoot();
+
+  copyDirectory(path.join(sourceRoot, 'skills'), path.join(targetRoot, 'skills'));
+  copyDirectory(
+    path.join(sourceRoot, 'workflows'),
+    path.join(targetRoot, 'global_workflows'),
+  );
+
+  return targetRoot;
+}
+
+function installGlobally(extensionRoot) {
+  return {
+    cascadeRoot: installCascadeGlobally(extensionRoot),
+    devinRoot: installDevinGlobally(extensionRoot),
+  };
 }
 
 function getExtensionVersion(extensionRoot) {
@@ -39,12 +62,15 @@ async function installGlobalCustomizationsOnActivation(context) {
   if (!configuration.get('installOnActivation', true)) return;
 
   const version = getExtensionVersion(context.extensionPath);
-  const targetRoot = getGlobalDevinRoot();
+  const devinRoot = getGlobalDevinRoot();
+  const cascadeRoot = getGlobalCascadeRoot();
   const installedVersion = context.globalState.get(GLOBAL_INSTALLATION_VERSION_KEY);
-  const targetExists = fs.existsSync(path.join(targetRoot, 'agents'))
-    && fs.existsSync(path.join(targetRoot, 'skills'));
+  const targetsExist = fs.existsSync(path.join(devinRoot, 'agents'))
+    && fs.existsSync(path.join(devinRoot, 'skills'))
+    && fs.existsSync(path.join(cascadeRoot, 'skills'))
+    && fs.existsSync(path.join(cascadeRoot, 'global_workflows'));
 
-  if (installedVersion === version && targetExists) return;
+  if (installedVersion === version && targetsExist) return;
 
   try {
     installGlobally(context.extensionPath);
@@ -71,16 +97,17 @@ function createStatusBarItem(context) {
   const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   item.command = INSTALL_COMMAND;
   item.text = '$(cloud-download) Devin Global';
-  item.tooltip = 'Instalar o actualizar agentes y skills de Devin globalmente';
+  item.tooltip = 'Instalar o actualizar agentes, skills y workflows de Devin/Cascade';
   item.show();
   context.subscriptions.push(item);
 }
 
 function activate(context) {
   const install = vscode.commands.registerCommand(INSTALL_COMMAND, async () => {
-    const targetRoot = getGlobalDevinRoot();
+    const devinRoot = getGlobalDevinRoot();
+    const cascadeRoot = getGlobalCascadeRoot();
     const choice = await vscode.window.showInformationMessage(
-      `Se instalarán los agentes y skills en ${targetRoot}. Los archivos existentes con el mismo nombre se actualizarán.`,
+      `Se instalarán las definiciones para Devin en ${devinRoot} y para Cascade en ${cascadeRoot}. Los archivos existentes con el mismo nombre se actualizarán.`,
       { modal: true },
       'Instalar / actualizar',
       'Cancelar',
@@ -89,9 +116,9 @@ function activate(context) {
     if (choice !== 'Instalar / actualizar') return;
 
     try {
-      const installedRoot = installGlobally(context.extensionPath);
+      const installedRoots = installGlobally(context.extensionPath);
       vscode.window.showInformationMessage(
-        `Agentes y skills de Devin instalados globalmente en ${installedRoot}. Reinicia Devin Desktop si no aparecen inmediatamente.`,
+        `Definiciones instaladas para Devin en ${installedRoots.devinRoot} y para Cascade en ${installedRoots.cascadeRoot}. Recarga Cascade o reinicia el IDE si no aparecen inmediatamente.`,
       );
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -140,6 +167,7 @@ function deactivate() {}
 module.exports = {
   activate,
   deactivate,
+  getGlobalCascadeRoot,
   getGlobalDevinRoot,
   installGlobally,
 };
