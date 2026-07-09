@@ -12,7 +12,130 @@ const INSTALL_COMMAND = 'devinGlobalCustomizations.installGlobally';
 const OPEN_FOLDER_COMMAND = 'devinGlobalCustomizations.openGlobalFolder';
 const CHECK_UPDATES_COMMAND = 'devinGlobalCustomizations.checkForUpdates';
 const INSTALL_UPDATE_COMMAND = 'devinGlobalCustomizations.installUpdate';
+const OPEN_DOCUMENT_COMMAND = 'devinGlobalCustomizations.openCustomizationDocument';
+const TREE_VIEW_ID = 'devinGlobalCustomizations.customizations';
 const GLOBAL_INSTALLATION_VERSION_KEY = 'globalInstallationVersion';
+
+function readFrontmatterMetadata(filePath, fallbackName) {
+  const content = fs.readFileSync(filePath, 'utf8');
+  const frontmatter = content.match(/^---\n([\s\S]*?)\n---\n?/);
+  const metadata = { description: '', name: fallbackName };
+  if (!frontmatter) return metadata;
+
+  for (const line of frontmatter[1].split('\n')) {
+    const field = line.match(/^([\w-]+):\s*(.+)$/);
+    if (!field) continue;
+    const value = field[2].trim().replace(/^['"]|['"]$/g, '');
+    if (field[1] === 'name') metadata.name = value;
+    if (field[1] === 'description') metadata.description = value;
+  }
+  return metadata;
+}
+
+class CustomizationTreeItem extends vscode.TreeItem {
+  constructor(label, collapsibleState, options = {}) {
+    super(label, collapsibleState);
+    this.contextValue = options.contextValue || 'customization';
+    this.description = options.description;
+    this.tooltip = options.tooltip || options.description || label;
+    this.iconPath = options.icon ? new vscode.ThemeIcon(options.icon) : undefined;
+    if (options.documentPath) {
+      this.command = {
+        command: OPEN_DOCUMENT_COMMAND,
+        title: 'Open customization definition',
+        arguments: [options.documentPath],
+      };
+    }
+  }
+}
+
+class CustomizationTreeProvider {
+  constructor(extensionRoot) {
+    this.extensionRoot = extensionRoot;
+    this.customizationsRoot = path.join(extensionRoot, 'customizations');
+  }
+
+  getTreeItem(element) {
+    return element;
+  }
+
+  getChildren(element) {
+    if (!element) {
+      return [
+        new CustomizationTreeItem('Usage', vscode.TreeItemCollapsibleState.Collapsed, {
+          contextValue: 'usage',
+          icon: 'book',
+        }),
+        new CustomizationTreeItem('Agents', vscode.TreeItemCollapsibleState.Collapsed, {
+          contextValue: 'agents',
+          icon: 'hubot',
+        }),
+        new CustomizationTreeItem('Skills', vscode.TreeItemCollapsibleState.Collapsed, {
+          contextValue: 'skills',
+          icon: 'lightbulb',
+        }),
+      ];
+    }
+
+    if (element.contextValue === 'usage') {
+      return [this.createDocumentItem(
+        'How to use agents and skills',
+        path.join(this.customizationsRoot, 'USAGE.md'),
+        'Open the usage guide',
+        'book',
+      )];
+    }
+
+    if (element.contextValue === 'agents') {
+      return this.getDefinitionItems(
+        path.join(this.customizationsRoot, 'agents'),
+        (entry) => entry.endsWith('.agent.md'),
+        (entry) => entry.replace(/\.agent\.md$/, ''),
+        'hubot',
+      );
+    }
+
+    if (element.contextValue === 'skills') {
+      const skillsRoot = path.join(this.customizationsRoot, 'skills');
+      if (!fs.existsSync(skillsRoot)) return [];
+      return fs.readdirSync(skillsRoot, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .sort((left, right) => left.name.localeCompare(right.name))
+        .map((entry) => {
+          const documentPath = path.join(skillsRoot, entry.name, 'SKILL.md');
+          const metadata = readFrontmatterMetadata(documentPath, entry.name);
+          return this.createDocumentItem(
+            metadata.name,
+            documentPath,
+            metadata.description,
+            'lightbulb',
+          );
+        });
+    }
+
+    return [];
+  }
+
+  getDefinitionItems(directory, filter, getName, icon) {
+    if (!fs.existsSync(directory)) return [];
+    return fs.readdirSync(directory)
+      .filter(filter)
+      .sort()
+      .map((entry) => {
+        const documentPath = path.join(directory, entry);
+        const metadata = readFrontmatterMetadata(documentPath, getName(entry));
+        return this.createDocumentItem(metadata.name, documentPath, metadata.description, icon);
+      });
+  }
+
+  createDocumentItem(label, documentPath, description, icon) {
+    return new CustomizationTreeItem(
+      label,
+      vscode.TreeItemCollapsibleState.None,
+      { description, documentPath, icon },
+    );
+  }
+}
 
 function installGlobally(extensionRoot) {
   return buildCustomizationTargets(extensionRoot, {
@@ -62,15 +185,6 @@ async function installGlobalCustomizationsOnActivation(context) {
   }
 }
 
-function createStatusBarItem(context) {
-  const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-  item.command = INSTALL_COMMAND;
-  item.text = '$(cloud-download) Devin Global';
-  item.tooltip = 'Instalar o actualizar agentes, skills y workflows de Devin/Cascade';
-  item.show();
-  context.subscriptions.push(item);
-}
-
 function activate(context) {
   const install = vscode.commands.registerCommand(INSTALL_COMMAND, async () => {
     const devinRoot = getGlobalDevinRoot();
@@ -101,6 +215,17 @@ function activate(context) {
     await vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(targetRoot));
   });
 
+  const openDocument = vscode.commands.registerCommand(OPEN_DOCUMENT_COMMAND, async (documentPath) => {
+    if (typeof documentPath !== 'string') return;
+    const document = await vscode.workspace.openTextDocument(vscode.Uri.file(documentPath));
+    await vscode.window.showTextDocument(document, { preview: false });
+  });
+
+  const treeView = vscode.window.createTreeView(TREE_VIEW_ID, {
+    treeDataProvider: new CustomizationTreeProvider(context.extensionPath),
+    showCollapseAll: true,
+  });
+
   const checkForUpdates = vscode.commands.registerCommand(CHECK_UPDATES_COMMAND, async () => {
     try {
       await updater.checkForUpdates(context, { interactive: true, notify: true });
@@ -123,10 +248,11 @@ function activate(context) {
   context.subscriptions.push(
     install,
     openFolder,
+    openDocument,
+    treeView,
     checkForUpdates,
     installUpdate,
   );
-  createStatusBarItem(context);
   void installGlobalCustomizationsOnActivation(context);
   void updater.autoCheck(context);
 }

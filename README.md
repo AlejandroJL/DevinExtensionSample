@@ -39,9 +39,8 @@ Agent Plugins; las actualizaciones deberán distribuirse como nuevas versiones
 de la extensión.
 
 Después de instalar el VSIX, usa la paleta de comandos y ejecuta
-`Devin/Cascade: Install or Update Global Customizations`, o pulsa el botón
-`Devin Global` de la barra de estado. La extensión instala las definiciones de
-Devin y Cascade en sus respectivas ubicaciones globales.
+`Devin/Cascade: Install or Update Global Customizations`. La extensión instala
+las definiciones de Devin y Cascade en sus respectivas ubicaciones globales.
 
 Para Devin genera `.devin/agents/` y `.devin/skills/` en
 `~/.config/devin/agents/` y `~/.config/devin/skills/` en macOS/Linux. En

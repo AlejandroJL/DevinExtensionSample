@@ -69,6 +69,9 @@ if (extensionManifest) {
   if (!fs.existsSync(path.join(root, 'src', 'global-path.js'))) {
     errors.push('Falta src/global-path.js');
   }
+  if (!fs.existsSync(path.join(root, 'customizations', 'USAGE.md'))) {
+    errors.push('Falta customizations/USAGE.md');
+  }
   if (extensionManifest.contributes?.configuration?.properties?.['devinGlobalCustomizations.updates.manifestUrl']?.default
       !== 'https://alejandrojl.github.io/DevinExtensionSample/updates/latest.json') {
     errors.push('package.json debe declarar la URL por defecto del manifiesto de GitHub Pages');

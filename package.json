@@ -2,7 +2,7 @@
   "name": "devin-global-customizations",
   "displayName": "Devin Global Customizations",
   "description": "Agentes y skills globales para Devin Desktop y VS Code.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "publisher": "devin-global-customizations",
   "license": "MIT",
   "main": "./extension.js",
@@ -90,6 +90,14 @@
       {
         "path": "./customizations/skills/safe-release/SKILL.md"
       }
-    ]
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "devinGlobalCustomizations.customizations",
+          "name": "Devin & Cascade Customizations"
+        }
+      ]
+    }
   }
 }

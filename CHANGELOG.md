@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.0] - 2026-07-09
+
+- Eliminada la barra de estado de la extensión.
+- Añadida una vista de árbol `Devin & Cascade Customizations` en el Explorer.
+- La vista incluye `Usage`, `Agents` y `Skills` con acceso a sus definiciones.
+
 ## [0.3.0] - 2026-07-09
 
 - Centralizada la definición de agentes, skills, workflows y rules en
