@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.1] - 2026-07-09
+
+- Añadida la estructura nativa `.devin/agents/` y `.devin/skills/` para Devin.
+- Añadida validación de las definiciones espejo de Devin.
+
 ## [0.1.0] - 2026-07-09
 
 - Añadido el manifiesto inicial del Agent Plugin.
