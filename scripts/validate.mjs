@@ -42,6 +42,17 @@ if (extensionManifest) {
   if (!fs.existsSync(path.join(root, 'extension.js'))) {
     errors.push('Falta extension.js');
   }
+  for (const command of [
+    'devinGlobalCustomizations.installGlobally',
+    'devinGlobalCustomizations.checkForUpdates',
+    'devinGlobalCustomizations.installUpdate',
+    'devinGlobalCustomizations.configureGitHubToken',
+    'devinGlobalCustomizations.clearGitHubToken',
+  ]) {
+    if (!(extensionManifest.contributes?.commands ?? []).some((entry) => entry.command === command)) {
+      errors.push(`package.json no declara el comando ${command}`);
+    }
+  }
 
   for (const contribution of extensionManifest.contributes?.chatAgents ?? []) {
     if (!fs.existsSync(path.join(root, contribution.path))) {

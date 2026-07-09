@@ -2,9 +2,14 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const vscode = require('vscode');
+const updater = require('./src/updater');
 
 const INSTALL_COMMAND = 'devinGlobalCustomizations.installGlobally';
 const OPEN_FOLDER_COMMAND = 'devinGlobalCustomizations.openGlobalFolder';
+const CHECK_UPDATES_COMMAND = 'devinGlobalCustomizations.checkForUpdates';
+const INSTALL_UPDATE_COMMAND = 'devinGlobalCustomizations.installUpdate';
+const CONFIGURE_TOKEN_COMMAND = 'devinGlobalCustomizations.configureGitHubToken';
+const CLEAR_TOKEN_COMMAND = 'devinGlobalCustomizations.clearGitHubToken';
 
 function getGlobalDevinRoot() {
   if (process.platform === 'win32') {
@@ -71,8 +76,42 @@ function activate(context) {
     await vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(targetRoot));
   });
 
-  context.subscriptions.push(install, openFolder);
+  const checkForUpdates = vscode.commands.registerCommand(CHECK_UPDATES_COMMAND, async () => {
+    try {
+      await updater.checkForUpdates(context, { interactive: true, notify: true });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      const action = await vscode.window.showErrorMessage(
+        `No se pudieron comprobar las actualizaciones de Devin: ${message}`,
+        'Configurar token GitHub',
+      );
+      if (action === 'Configurar token GitHub') await vscode.commands.executeCommand(CONFIGURE_TOKEN_COMMAND);
+    }
+  });
+
+  const installUpdate = vscode.commands.registerCommand(INSTALL_UPDATE_COMMAND, async () => {
+    try {
+      const update = await updater.checkForUpdates(context, { interactive: true, notify: false });
+      if (update) await updater.installUpdate(context, update);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      vscode.window.showErrorMessage(`No se pudo instalar la actualización de Devin: ${message}`);
+    }
+  });
+
+  const configureToken = vscode.commands.registerCommand(CONFIGURE_TOKEN_COMMAND, () => updater.configureToken(context));
+  const clearToken = vscode.commands.registerCommand(CLEAR_TOKEN_COMMAND, () => updater.clearToken(context));
+
+  context.subscriptions.push(
+    install,
+    openFolder,
+    checkForUpdates,
+    installUpdate,
+    configureToken,
+    clearToken,
+  );
   createStatusBarItem(context);
+  void updater.autoCheck(context);
 }
 
 function deactivate() {}

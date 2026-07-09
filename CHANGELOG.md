@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4] - 2026-07-09
+
+- Añadida comprobación manual y automática de actualizaciones desde GitHub Releases.
+- Añadida descarga verificada por SHA-256 e instalación del VSIX desde la extensión.
+- Añadida autenticación mediante GitHub Authentication de VS Code o token protegido.
+- No se requiere ni se ejecuta `gh` como fallback.
+
 ## [0.1.3] - 2026-07-09
 
 - Añadido el comando y botón `Devin: Install or Update Agents and Skills Globally`.

@@ -44,6 +44,23 @@ Después de instalar el VSIX, usa la paleta de comandos y ejecuta
 `.devin/skills/` a `~/.config/devin/agents/` y `~/.config/devin/skills/`.
 En Windows usa `%APPDATA%/devin/agents/` y `%APPDATA%/devin/skills/`.
 
+### Actualizaciones desde GitHub Releases
+
+La extensión puede buscar actualizaciones manualmente con
+`Devin: Check for Updates` o automáticamente cada 24 horas. Para instalar una
+versión detectada usa `Devin: Download and Install Update` o el botón de la
+notificación.
+
+El repositorio privado requiere autenticación. La extensión intenta usar la
+sesión de GitHub del IDE; si no está disponible, ejecuta
+`Devin: Configure GitHub Token` y guarda un token con permiso de lectura del
+contenido del repositorio en el almacenamiento seguro de VS Code. La extensión
+no usa ni ejecuta GitHub CLI.
+
+Las releases deben contener el VSIX y `SHA256SUMS.txt`. El workflow de GitHub
+Actions incluido en `.github/workflows/release.yml` genera ambos archivos al
+publicar un tag `v*`.
+
 Como alternativa para probar una copia local, configura la ruta del repositorio
 en `chat.pluginLocations`:
 
