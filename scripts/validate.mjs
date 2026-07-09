@@ -29,6 +29,28 @@ try {
   errors.push(`package.json no es JSON válido: ${error.message}`);
 }
 
+let updateManifest;
+try {
+  updateManifest = JSON.parse(read('updates/latest.json'));
+} catch (error) {
+  errors.push(`updates/latest.json no es JSON válido: ${error.message}`);
+}
+
+if (updateManifest) {
+  if (updateManifest.name !== manifest?.name) {
+    errors.push('updates/latest.json y plugin.json deben usar el mismo name');
+  }
+  if (updateManifest.version !== manifest?.version) {
+    errors.push('updates/latest.json y plugin.json deben usar la misma version');
+  }
+  if (!/^https:\/\//.test(updateManifest.downloadUrl ?? '')) {
+    errors.push('updates/latest.json debe usar una downloadUrl HTTPS');
+  }
+  if (!/^[a-f0-9]{64}$/i.test(updateManifest.sha256 ?? '')) {
+    errors.push('updates/latest.json debe contener un SHA-256 válido');
+  }
+}
+
 if (extensionManifest) {
   if (extensionManifest.name !== manifest?.name) {
     errors.push('package.json y plugin.json deben usar el mismo name');

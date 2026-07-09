@@ -66,6 +66,9 @@ El JSON contiene `version`, `downloadUrl`, `fileName`, `sha256` y
 `releaseNotesUrl`. La extensión descarga únicamente la URL indicada y valida el
 SHA-256 antes de instalar el VSIX.
 
+Los recursos publicados se encuentran bajo `/updates/`: `latest.json`, el VSIX
+y una página informativa.
+
 El workflow de GitHub Actions incluido en `.github/workflows/pages.yml` genera
 el manifiesto y publica el VSIX en GitHub Pages en cada cambio de `main`. Hay
 que seleccionar `GitHub Actions` como origen en Settings → Pages la primera

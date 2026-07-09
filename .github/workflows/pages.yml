@@ -36,9 +36,9 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf _site
-          mkdir -p _site/updates _site/downloads
+          mkdir -p _site/updates
           VSIX_FILE="devin-global-customizations-$(node -p "require('./package.json').version").vsix"
-          cp "$VSIX_FILE" "_site/downloads/$VSIX_FILE"
+          cp "$VSIX_FILE" "_site/updates/$VSIX_FILE"
           SHA256=$(sha256sum "$VSIX_FILE" | awk '{print $1}')
           export VSIX_FILE SHA256
           node <<'NODE'
@@ -50,12 +50,13 @@ jobs:
             name: packageJson.name,
             version: packageJson.version,
             fileName: process.env.VSIX_FILE,
-            downloadUrl: `${baseUrl}/downloads/${process.env.VSIX_FILE}`,
+            downloadUrl: `${baseUrl}/updates/${process.env.VSIX_FILE}`,
             sha256: process.env.SHA256,
             releaseNotesUrl: `https://github.com/${process.env.REPOSITORY}/commits/main`,
             sourceRevision: process.env.COMMIT_SHA,
           };
           fs.writeFileSync('_site/index.html', '<!doctype html><title>Devin Global Customizations</title>');
+          fs.writeFileSync('_site/updates/index.html', '<!doctype html><title>Devin Global Customizations Updates</title><p><a href="latest.json">latest.json</a></p>');
           fs.writeFileSync('_site/updates/latest.json', `${JSON.stringify(manifest, null, 2)}\n`);
           NODE
 
