@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.5] - 2026-07-09
+
+- Sustituida la consulta de GitHub Releases por un manifiesto estático de GitHub Pages.
+- Añadida descarga del VSIX desde la `downloadUrl` del manifiesto.
+- Añadido workflow para publicar `updates/latest.json` y el VSIX en GitHub Pages.
+
 ## [0.1.4] - 2026-07-09
 
 - Añadida comprobación manual y automática de actualizaciones desde GitHub Releases.

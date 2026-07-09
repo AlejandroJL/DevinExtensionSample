@@ -44,22 +44,32 @@ Después de instalar el VSIX, usa la paleta de comandos y ejecuta
 `.devin/skills/` a `~/.config/devin/agents/` y `~/.config/devin/skills/`.
 En Windows usa `%APPDATA%/devin/agents/` y `%APPDATA%/devin/skills/`.
 
-### Actualizaciones desde GitHub Releases
+### Actualizaciones desde GitHub Pages
 
 La extensión puede buscar actualizaciones manualmente con
 `Devin: Check for Updates` o automáticamente cada 24 horas. Para instalar una
 versión detectada usa `Devin: Download and Install Update` o el botón de la
 notificación.
 
-El repositorio privado requiere autenticación. La extensión intenta usar la
-sesión de GitHub del IDE; si no está disponible, ejecuta
-`Devin: Configure GitHub Token` y guarda un token con permiso de lectura del
-contenido del repositorio en el almacenamiento seguro de VS Code. La extensión
-no usa ni ejecuta GitHub CLI.
+La extensión consulta por defecto:
 
-Las releases deben contener el VSIX y `SHA256SUMS.txt`. El workflow de GitHub
-Actions incluido en `.github/workflows/release.yml` genera ambos archivos al
-publicar un tag `v*`.
+```text
+https://alejandrojl.github.io/DevinExtensionSample/updates/latest.json
+```
+
+El JSON contiene `version`, `downloadUrl`, `fileName`, `sha256` y
+`releaseNotesUrl`. La extensión descarga únicamente la URL indicada y valida el
+SHA-256 antes de instalar el VSIX.
+
+El workflow de GitHub Actions incluido en `.github/workflows/pages.yml` genera
+el manifiesto y publica el VSIX en GitHub Pages en cada cambio de `main`. Hay
+que seleccionar `GitHub Actions` como origen en Settings → Pages la primera
+vez. GitHub Pages puede publicar contenido de repositorios privados solo cuando
+el plan de la cuenta lo permite.
+
+Si la Page requiere autenticación, la extensión intenta usar la sesión GitHub
+del IDE. También puedes usar `Devin: Configure GitHub Token`; el token queda
+guardado en el almacenamiento seguro de VS Code. No se usa GitHub CLI.
 
 Como alternativa para probar una copia local, configura la ruta del repositorio
 en `chat.pluginLocations`:

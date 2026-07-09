@@ -4,11 +4,11 @@ const path = require('node:path');
 const vscode = require('vscode');
 const {
   downloadAsset,
-  getLatestRelease,
+  getUpdateManifest,
   sha256File,
-} = require('./github-releases');
+} = require('./update-manifest');
 
-const TOKEN_SECRET_KEY = 'githubToken';
+const TOKEN_SECRET_KEY = 'githubPagesToken';
 const LAST_CHECK_KEY = 'lastUpdateCheck';
 
 function parseVersion(value) {
@@ -26,16 +26,15 @@ function compareVersions(left, right) {
   return 0;
 }
 
-function getRepository(manifest) {
-  const repositoryUrl = manifest.repository?.url;
-  const match = repositoryUrl?.match(/github\.com[/:]([^/]+)\/([^/.]+?)(?:\.git)?$/i);
-  if (!match) throw new Error('No se pudo determinar el repositorio GitHub desde package.json.');
-  return { owner: match[1], repository: match[2] };
-}
-
 function getManifest(extensionRoot) {
   const manifestPath = path.join(extensionRoot, 'package.json');
   return JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+}
+
+function getUpdateManifestUrl() {
+  return vscode.workspace
+    .getConfiguration('devinGlobalCustomizations.updates')
+    .get('manifestUrl');
 }
 
 async function getToken(context, interactive) {
@@ -51,73 +50,72 @@ async function getToken(context, interactive) {
       );
       if (session?.accessToken) return session.accessToken;
     } catch {
-      // Continue without an interactive session; a stored token may still exist.
+      // The Pages manifest can be public; authentication is optional.
     }
   }
 
   return null;
 }
 
-function findVsixAsset(release, packageName) {
-  const expectedName = `${packageName}-${String(release.tag_name).replace(/^v/i, '')}.vsix`;
-  return release.assets?.find((asset) => asset.name === expectedName)
-    || release.assets?.find((asset) => asset.name.endsWith('.vsix'));
+function validateUpdateManifest(updateManifest, packageName) {
+  if (updateManifest.name && updateManifest.name !== packageName) {
+    throw new Error(`El manifiesto pertenece a ${updateManifest.name}, no a ${packageName}.`);
+  }
+  if (!parseVersion(updateManifest.version)) {
+    throw new Error('El manifiesto no contiene una versión SemVer válida.');
+  }
+  if (!updateManifest.downloadUrl || new URL(updateManifest.downloadUrl).protocol !== 'https:') {
+    throw new Error('El manifiesto debe contener una downloadUrl HTTPS.');
+  }
+  if (!/^[a-f0-9]{64}$/i.test(updateManifest.sha256 || '')) {
+    throw new Error('El manifiesto no contiene un SHA-256 válido.');
+  }
 }
 
-function findDigestAsset(release) {
-  return release.assets?.find((asset) => asset.name === 'SHA256SUMS.txt');
-}
+async function fetchManifest(context, interactive) {
+  const manifestUrl = getUpdateManifestUrl();
+  if (!manifestUrl) throw new Error('No hay una URL de manifiesto configurada.');
 
-function readExpectedDigest(text, assetName) {
-  const escapedName = assetName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const match = text.match(new RegExp(`^([a-f0-9]{64})\\s+\\*?${escapedName}\\s*$`, 'mi'));
-  return match?.[1] || null;
-}
-
-async function expectedDigest(release, asset, token, temporaryDirectory) {
-  if (asset.digest?.startsWith('sha256:')) return asset.digest.slice('sha256:'.length);
-
-  const digestAsset = findDigestAsset(release);
-  if (!digestAsset) return null;
-
-  const digestPath = path.join(temporaryDirectory, digestAsset.name);
-  await downloadAsset(digestAsset.browser_download_url, digestPath, token);
-  return readExpectedDigest(fs.readFileSync(digestPath, 'utf8'), asset.name);
+  try {
+    return { manifestUrl, token: null, updateManifest: await getUpdateManifest(manifestUrl) };
+  } catch (publicRequestError) {
+    const token = await getToken(context, interactive);
+    if (!token) throw publicRequestError;
+    return { manifestUrl, token, updateManifest: await getUpdateManifest(manifestUrl, token) };
+  }
 }
 
 async function checkForUpdates(context, { interactive = false, notify = true } = {}) {
-  const manifest = getManifest(context.extensionPath);
-  const repository = getRepository(manifest);
-  const token = await getToken(context, interactive);
-  const release = await getLatestRelease(repository.owner, repository.repository, token);
+  const extensionManifest = getManifest(context.extensionPath);
+  const { manifestUrl, token, updateManifest } = await fetchManifest(context, interactive);
+  validateUpdateManifest(updateManifest, extensionManifest.name);
 
-  if (release.draft || release.prerelease) return null;
-  const latestVersion = String(release.tag_name).replace(/^v/i, '');
-  if (compareVersions(latestVersion, manifest.version) <= 0) {
+  if (compareVersions(updateManifest.version, extensionManifest.version) <= 0) {
     if (interactive) {
-      vscode.window.showInformationMessage(`Devin Global Customizations ya está actualizado (${manifest.version}).`);
+      vscode.window.showInformationMessage(
+        `Devin Global Customizations ya está actualizado (${extensionManifest.version}).`,
+      );
     }
     return null;
   }
 
-  const asset = findVsixAsset(release, manifest.name);
-  if (!asset) throw new Error(`La release ${release.tag_name} no contiene un archivo VSIX.`);
-
-  const update = { asset, latestVersion, manifest, release, repository, token };
+  const update = { extensionManifest, manifestUrl, token, updateManifest };
   await context.globalState.update('latestUpdate', {
-    version: latestVersion,
-    releaseUrl: release.html_url,
+    version: updateManifest.version,
+    manifestUrl,
   });
 
   if (notify) {
     const action = await vscode.window.showInformationMessage(
-      `Hay una nueva versión de Devin Global Customizations: ${latestVersion}.`,
+      `Hay una nueva versión de Devin Global Customizations: ${updateManifest.version}.`,
       'Descargar e instalar',
-      'Ver release',
+      'Ver información',
       'Más tarde',
     );
     if (action === 'Descargar e instalar') await installUpdate(context, update);
-    if (action === 'Ver release') await vscode.env.openExternal(vscode.Uri.parse(release.html_url));
+    if (action === 'Ver información' && updateManifest.releaseNotesUrl) {
+      await vscode.env.openExternal(vscode.Uri.parse(updateManifest.releaseNotesUrl));
+    }
   }
 
   return update;
@@ -125,21 +123,22 @@ async function checkForUpdates(context, { interactive = false, notify = true } =
 
 async function installUpdate(context, update) {
   const token = update.token || await getToken(context, true);
+  const fileName = update.updateManifest.fileName
+    || `devin-global-customizations-${update.updateManifest.version}.vsix`;
   const temporaryDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'devin-global-update-'));
-  const vsixPath = path.join(temporaryDirectory, update.asset.name);
+  const vsixPath = path.join(temporaryDirectory, fileName);
 
   try {
-    await downloadAsset(update.asset.browser_download_url, vsixPath, token);
+    await downloadAsset(update.updateManifest.downloadUrl, vsixPath, token);
     const actualDigest = await sha256File(vsixPath);
-    const expected = await expectedDigest(update.release, update.asset, token, temporaryDirectory);
-    if (!expected) throw new Error('La release no contiene un digest SHA-256 verificable.');
-    if (actualDigest !== expected) {
-      throw new Error(`El checksum no coincide. Esperado ${expected}, obtenido ${actualDigest}.`);
+    const expectedDigest = update.updateManifest.sha256.toLowerCase();
+    if (actualDigest !== expectedDigest) {
+      throw new Error(`El checksum no coincide. Esperado ${expectedDigest}, obtenido ${actualDigest}.`);
     }
 
     await vscode.commands.executeCommand('workbench.extensions.installExtension', vscode.Uri.file(vsixPath));
     const reload = await vscode.window.showInformationMessage(
-      `Versión ${update.latestVersion} instalada. Recarga Devin Desktop para activarla.`,
+      `Versión ${update.updateManifest.version} instalada. Recarga Devin Desktop para activarla.`,
       'Recargar ahora',
     );
     if (reload === 'Recargar ahora') await vscode.commands.executeCommand('workbench.action.reloadWindow');
@@ -152,17 +151,17 @@ async function configureToken(context) {
   const token = await vscode.window.showInputBox({
     ignoreFocusOut: true,
     password: true,
-    prompt: 'Token GitHub con acceso de lectura al repositorio privado',
+    prompt: 'Token GitHub con acceso de lectura a la GitHub Page protegida',
     placeHolder: 'github_pat_…',
   });
   if (!token) return;
   await context.secrets.store(TOKEN_SECRET_KEY, token.trim());
-  vscode.window.showInformationMessage('Token GitHub guardado de forma segura.');
+  vscode.window.showInformationMessage('Token de GitHub Pages guardado de forma segura.');
 }
 
 async function clearToken(context) {
   await context.secrets.delete(TOKEN_SECRET_KEY);
-  vscode.window.showInformationMessage('Token GitHub eliminado de la extensión.');
+  vscode.window.showInformationMessage('Token de GitHub Pages eliminado de la extensión.');
 }
 
 async function autoCheck(context) {

@@ -1,0 +1,79 @@
+name: Publish update manifest to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Package VSIX
+        run: npx --yes @vscode/vsce package
+
+      - name: Build static update site
+        env:
+          REPOSITORY: ${{ github.repository }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          mkdir -p _site/updates _site/downloads
+          VSIX_FILE="devin-global-customizations-$(node -p "require('./package.json').version").vsix"
+          cp "$VSIX_FILE" "_site/downloads/$VSIX_FILE"
+          SHA256=$(sha256sum "$VSIX_FILE" | awk '{print $1}')
+          export VSIX_FILE SHA256
+          node <<'NODE'
+          const fs = require('node:fs');
+          const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const [owner, repository] = process.env.REPOSITORY.split('/');
+          const baseUrl = `https://${owner.toLowerCase()}.github.io/${repository}`;
+          const manifest = {
+            name: packageJson.name,
+            version: packageJson.version,
+            fileName: process.env.VSIX_FILE,
+            downloadUrl: `${baseUrl}/downloads/${process.env.VSIX_FILE}`,
+            sha256: process.env.SHA256,
+            releaseNotesUrl: `https://github.com/${process.env.REPOSITORY}/commits/main`,
+            sourceRevision: process.env.COMMIT_SHA,
+          };
+          fs.writeFileSync('_site/index.html', '<!doctype html><title>Devin Global Customizations</title>');
+          fs.writeFileSync('_site/updates/latest.json', `${JSON.stringify(manifest, null, 2)}\n`);
+          NODE
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
