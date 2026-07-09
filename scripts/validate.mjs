@@ -123,100 +123,44 @@ function validateMarkdown(relativePath, expectedName, extension) {
   }
 }
 
-function validateDevinSkillMirror() {
-  const sourcePath = path.join(root, 'skills');
-  const targetPath = path.join(root, '.devin', 'skills');
-  if (!fs.existsSync(sourcePath)) return;
-
-  for (const entry of fs.readdirSync(sourcePath, { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue;
-    const expectedFile = path.join(targetPath, entry.name, 'SKILL.md');
-    if (!fs.existsSync(expectedFile)) {
-      errors.push(`Falta la definición Devin ${path.relative(root, expectedFile)}`);
-    }
-  }
-}
-
-function validateCascadeMirrors() {
-  const cascadeRoot = path.join(root, '.codeium', 'windsurf', 'windsurf');
-  const skillsPath = path.join(cascadeRoot, 'skills');
-  const workflowsPath = path.join(cascadeRoot, 'workflows');
-
-  if (!fs.existsSync(skillsPath)) {
-    errors.push('Falta la estructura Cascade .codeium/windsurf/windsurf/skills');
-  }
-  if (!fs.existsSync(workflowsPath)) {
-    errors.push('Falta la estructura Cascade .codeium/windsurf/windsurf/workflows');
-  }
-
-  for (const entry of fs.readdirSync(path.join(root, 'skills'), { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue;
-    const expectedFile = path.join(skillsPath, entry.name, 'SKILL.md');
-    if (!fs.existsSync(expectedFile)) {
-      errors.push(`Falta la definición Cascade ${path.relative(root, expectedFile)}`);
+function validateCanonicalSource() {
+  const sourceRoot = path.join(root, 'customizations');
+  for (const directory of ['agents', 'skills', 'rules', 'workflows']) {
+    if (!fs.existsSync(path.join(sourceRoot, directory))) {
+      errors.push(`Falta customizations/${directory}/`);
     }
   }
 
-  for (const entry of fs.readdirSync(path.join(root, 'agents'))) {
-    if (!entry.endsWith('.agent.md')) continue;
-    const agentName = entry.replace(/\.agent\.md$/, '');
-    const expectedFile = path.join(workflowsPath, `${agentName}.md`);
-    if (!fs.existsSync(expectedFile)) {
-      errors.push(`Falta el workflow Cascade ${path.relative(root, expectedFile)}`);
+  const agentsPath = path.join(sourceRoot, 'agents');
+  if (fs.existsSync(agentsPath)) {
+    for (const entry of fs.readdirSync(agentsPath)) {
+      if (!entry.endsWith('.agent.md')) {
+        errors.push(`customizations/agents/${entry}: los agentes deben terminar en .agent.md`);
+        continue;
+      }
+      validateMarkdown(
+        `customizations/agents/${entry}`,
+        entry.replace(/\.agent\.md$/, ''),
+        '.agent.md',
+      );
     }
   }
-}
 
-function validateDevinAgentMirror() {
-  const sourcePath = path.join(root, 'agents');
-  const targetPath = path.join(root, '.devin', 'agents');
-  if (!fs.existsSync(sourcePath)) return;
-
-  for (const entry of fs.readdirSync(sourcePath)) {
-    if (!entry.endsWith('.agent.md')) continue;
-    const agentName = entry.replace(/\.agent\.md$/, '');
-    const expectedFile = path.join(targetPath, agentName, 'AGENT.md');
-    if (!fs.existsSync(expectedFile)) {
-      errors.push(`Falta la definición Devin ${path.relative(root, expectedFile)}`);
-    }
-  }
-}
-
-for (const directory of ['agents', 'skills']) {
-  const directoryPath = path.join(root, directory);
-  if (!fs.existsSync(directoryPath)) {
-    errors.push(`Falta el directorio ${directory}/`);
-    continue;
-  }
-
-  for (const entry of fs.readdirSync(directoryPath, { withFileTypes: true })) {
-    if (!entry.isDirectory() && directory === 'agents') continue;
-    const entryPath = path.join(directoryPath, entry.name);
-    if (directory === 'skills') {
-      const skillPath = path.join(entryPath, 'SKILL.md');
+  const skillsPath = path.join(sourceRoot, 'skills');
+  if (fs.existsSync(skillsPath)) {
+    for (const entry of fs.readdirSync(skillsPath, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      const skillPath = path.join(skillsPath, entry.name, 'SKILL.md');
       if (!fs.existsSync(skillPath)) {
-        errors.push(`Falta ${directory}/${entry.name}/SKILL.md`);
+        errors.push(`Falta customizations/skills/${entry.name}/SKILL.md`);
       } else {
-        validateMarkdown(`${directory}/${entry.name}/SKILL.md`, entry.name, '.md');
+        validateMarkdown(`customizations/skills/${entry.name}/SKILL.md`, entry.name, '.md');
       }
     }
   }
 }
 
-const agentsPath = path.join(root, 'agents');
-if (fs.existsSync(agentsPath)) {
-  for (const entry of fs.readdirSync(agentsPath)) {
-    if (!entry.endsWith('.agent.md')) {
-      errors.push(`agents/${entry}: los agentes deben terminar en .agent.md`);
-      continue;
-    }
-    validateMarkdown(`agents/${entry}`, entry.replace(/\.agent\.md$/, ''), '.agent.md');
-  }
-}
-
-validateDevinAgentMirror();
-validateDevinSkillMirror();
-validateCascadeMirrors();
+validateCanonicalSource();
 
 if (errors.length > 0) {
   console.error(errors.map((error) => `- ${error}`).join('\n'));

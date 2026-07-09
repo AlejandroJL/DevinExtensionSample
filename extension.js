@@ -2,6 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vscode = require('vscode');
 const updater = require('./src/updater');
+const { buildCustomizationTargets } = require('./src/customization-builder');
 const {
   getGlobalCascadeRoot,
   getGlobalDevinRoot,
@@ -13,43 +14,11 @@ const CHECK_UPDATES_COMMAND = 'devinGlobalCustomizations.checkForUpdates';
 const INSTALL_UPDATE_COMMAND = 'devinGlobalCustomizations.installUpdate';
 const GLOBAL_INSTALLATION_VERSION_KEY = 'globalInstallationVersion';
 
-function copyDirectory(source, target) {
-  if (!fs.existsSync(source)) {
-    throw new Error(`No existe el directorio de origen: ${source}`);
-  }
-
-  fs.mkdirSync(target, { recursive: true });
-  fs.cpSync(source, target, { recursive: true, force: true });
-}
-
-function installDevinGlobally(extensionRoot) {
-  const sourceRoot = path.join(extensionRoot, '.devin');
-  const targetRoot = getGlobalDevinRoot();
-
-  copyDirectory(path.join(sourceRoot, 'agents'), path.join(targetRoot, 'agents'));
-  copyDirectory(path.join(sourceRoot, 'skills'), path.join(targetRoot, 'skills'));
-
-  return targetRoot;
-}
-
-function installCascadeGlobally(extensionRoot) {
-  const sourceRoot = path.join(extensionRoot, '.codeium', 'windsurf', 'windsurf');
-  const targetRoot = getGlobalCascadeRoot();
-
-  copyDirectory(path.join(sourceRoot, 'skills'), path.join(targetRoot, 'skills'));
-  copyDirectory(
-    path.join(sourceRoot, 'workflows'),
-    path.join(targetRoot, 'global_workflows'),
-  );
-
-  return targetRoot;
-}
-
 function installGlobally(extensionRoot) {
-  return {
-    cascadeRoot: installCascadeGlobally(extensionRoot),
-    devinRoot: installDevinGlobally(extensionRoot),
-  };
+  return buildCustomizationTargets(extensionRoot, {
+    cascadeRoot: getGlobalCascadeRoot(),
+    devinRoot: getGlobalDevinRoot(),
+  });
 }
 
 function getExtensionVersion(extensionRoot) {

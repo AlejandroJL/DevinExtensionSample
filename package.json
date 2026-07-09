@@ -2,7 +2,7 @@
   "name": "devin-global-customizations",
   "displayName": "Devin Global Customizations",
   "description": "Agentes y skills globales para Devin Desktop y VS Code.",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "publisher": "devin-global-customizations",
   "license": "MIT",
   "main": "./extension.js",
@@ -71,24 +71,24 @@
     },
     "chatAgents": [
       {
-        "path": "./agents/global-planner.agent.md"
+        "path": "./customizations/agents/global-planner.agent.md"
       },
       {
-        "path": "./agents/global-reviewer.agent.md"
+        "path": "./customizations/agents/global-reviewer.agent.md"
       },
       {
-        "path": "./agents/random-orbit.agent.md"
+        "path": "./customizations/agents/random-orbit.agent.md"
       },
       {
-        "path": "./agents/update-sentinel.agent.md"
+        "path": "./customizations/agents/update-sentinel.agent.md"
       }
     ],
     "chatSkills": [
       {
-        "path": "./skills/project-discovery/SKILL.md"
+        "path": "./customizations/skills/project-discovery/SKILL.md"
       },
       {
-        "path": "./skills/safe-release/SKILL.md"
+        "path": "./customizations/skills/safe-release/SKILL.md"
       }
     ]
   }

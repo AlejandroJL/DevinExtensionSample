@@ -47,7 +47,7 @@ assert.equal(
     homeDirectory: '/Users/example',
     pathApi: path.posix,
   }),
-  '/Users/example/.codeium/windsurf/windsurf',
+  '/Users/example/.codeium/windsurf',
 );
 
 assert.equal(
@@ -55,7 +55,7 @@ assert.equal(
     homeDirectory: 'C:\\Users\\example',
     pathApi: path.win32,
   }),
-  'C:\\Users\\example\\.codeium\\windsurf\\windsurf',
+  'C:\\Users\\example\\.codeium\\windsurf',
 );
 
 console.log('Rutas globales de Devin válidas para macOS, Linux y Windows');

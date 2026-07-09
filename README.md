@@ -6,15 +6,12 @@ pueden estar disponibles en cualquier ventana o espacio de trabajo del IDE.
 
 ## Qué contiene
 
-- `agents/`: agentes personalizados (`*.agent.md`).
-- `skills/`: skills compatibles con el estándar Agent Skills (`SKILL.md`).
-- `.devin/agents/`: agentes nativos de Devin, con formato
-  `.devin/agents/<nombre>/AGENT.md`.
-- `.devin/skills/`: skills nativas de Devin, con formato
-  `.devin/skills/<nombre>/SKILL.md`.
-- `.codeium/windsurf/windsurf/skills/`: skills compatibles con Cascade.
-- `.codeium/windsurf/windsurf/workflows/`: workflows de Cascade derivados de
-  los agentes del plugin.
+- `customizations/agents/`: fuente única de agentes (`*.agent.md`).
+- `customizations/skills/`: fuente única de skills (`SKILL.md`).
+- `customizations/workflows/`: workflows adicionales específicos de Windsurf.
+- `customizations/rules/`: reglas globales compartidas con Windsurf.
+- Las carpetas `.devin/` y `.codeium/` se generan al instalar; no son fuentes
+  duplicadas del proyecto.
 - `plugin.json`: manifiesto del plugin y punto de entrada para la instalación
   desde Git.
 - `scripts/validate.mjs`: validación local del manifiesto y de los recursos.
@@ -46,16 +43,15 @@ Después de instalar el VSIX, usa la paleta de comandos y ejecuta
 `Devin Global` de la barra de estado. La extensión instala las definiciones de
 Devin y Cascade en sus respectivas ubicaciones globales.
 
-Para Devin copia `.devin/agents/` y `.devin/skills/` a
+Para Devin genera `.devin/agents/` y `.devin/skills/` en
 `~/.config/devin/agents/` y `~/.config/devin/skills/` en macOS/Linux. En
 Windows usa `%APPDATA%/devin/agents/` y `%APPDATA%/devin/skills/`.
 
-Para Cascade copia `.codeium/windsurf/windsurf/skills/` a
-`~/.codeium/windsurf/windsurf/skills/` y
-`.codeium/windsurf/windsurf/workflows/` a
-`~/.codeium/windsurf/windsurf/global_workflows/`. En Windows estas rutas se
+Para Cascade genera los workflows de los agentes en
+`~/.codeium/windsurf/global_workflows/` y copia las skills en
+`~/.codeium/windsurf/skills/`. En Windows estas rutas se
 resuelven bajo el perfil del usuario, por ejemplo
-`C:\\Users\\<usuario>\\.codeium\\windsurf\\windsurf\\skills\\`.
+`C:\\Users\\<usuario>\\.codeium\\windsurf\\skills\\`.
 
 Por defecto, esa copia también se ejecuta automáticamente cuando la extensión
 se instala o se activa después de una actualización. Puedes desactivarla con
@@ -120,18 +116,20 @@ node scripts/validate.mjs
 Si necesitas generar un VSIX, instala `@vscode/vsce` en tu entorno y ejecuta
 `vsce package` desde la raíz del repositorio.
 
-Al añadir un skill, el nombre del directorio debe coincidir exactamente con el
-campo `name` de su frontmatter. Los nombres de plugins y skills deben usar
-minúsculas, números y guiones.
+Al añadir una skill, créala únicamente en
+`customizations/skills/<nombre>/SKILL.md`; el nombre del directorio debe
+coincidir exactamente con el campo `name` de su frontmatter. Los nombres de
+plugins y skills deben usar minúsculas, números y guiones. Los agentes se
+añaden únicamente en `customizations/agents/` y se transforman en agentes de
+Devin y workflows de Windsurf durante la instalación.
 
 ## Alcance de Devin
 
-Devin puede descubrir las definiciones del proyecto bajo `.devin/agents/` y
-`.devin/skills/`. Cascade descubre las skills bajo
-`.codeium/windsurf/windsurf/skills/` y los workflows bajo
-`.codeium/windsurf/windsurf/workflows/`. Para disponer de los recursos entre
-ventanas, instala el Agent Plugin y ejecuta la sincronización global de la
-extensión.
+La carpeta `customizations/` es la única fuente versionada. La extensión
+construye las definiciones de Devin bajo `.devin/agents/` y `.devin/skills/`, y
+las de Windsurf bajo `~/.codeium/windsurf/global_workflows/` y
+`~/.codeium/windsurf/skills/`. Para disponer de los recursos entre ventanas,
+instala el Agent Plugin y ejecuta la sincronización global de la extensión.
 
 ## Licencia
 

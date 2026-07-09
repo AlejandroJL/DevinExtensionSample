@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.0] - 2026-07-09
+
+- Centralizada la definición de agentes, skills, workflows y rules en
+  `customizations/`.
+- Añadida una construcción en tiempo de instalación para generar los formatos
+  de Devin y Windsurf desde esa fuente única.
+- Windsurf instala agentes como workflows en
+  `~/.codeium/windsurf/global_workflows/` y skills en
+  `~/.codeium/windsurf/skills/`.
+
 ## [0.2.1] - 2026-07-09
 
 - Ajustada la ruta global de Cascade a `~/.codeium/windsurf/windsurf/`.
