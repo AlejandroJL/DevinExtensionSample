@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.6] - 2026-07-09
+
+- Añadido el agente experimental `random-orbit` para probar la actualización.
+
 ## [0.1.5] - 2026-07-09
 
 - Sustituida la consulta de GitHub Releases por un manifiesto estático de GitHub Pages.
