@@ -36,6 +36,12 @@ if (extensionManifest) {
   if (extensionManifest.version !== manifest?.version) {
     errors.push('package.json y plugin.json deben usar la misma version');
   }
+  if (extensionManifest.main !== './extension.js') {
+    errors.push('package.json debe declarar extension.js como main');
+  }
+  if (!fs.existsSync(path.join(root, 'extension.js'))) {
+    errors.push('Falta extension.js');
+  }
 
   for (const contribution of extensionManifest.contributes?.chatAgents ?? []) {
     if (!fs.existsSync(path.join(root, contribution.path))) {

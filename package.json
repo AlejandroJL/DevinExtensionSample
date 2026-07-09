@@ -2,9 +2,13 @@
   "name": "devin-global-customizations",
   "displayName": "Devin Global Customizations",
   "description": "Agentes y skills globales para Devin Desktop y VS Code.",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "publisher": "devin-global-customizations",
   "license": "MIT",
+  "main": "./extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/AlejandroJL/DevinExtensionSample.git"
@@ -16,6 +20,18 @@
     "Other"
   ],
   "contributes": {
+    "commands": [
+      {
+        "command": "devinGlobalCustomizations.installGlobally",
+        "title": "Devin: Install or Update Agents and Skills Globally",
+        "category": "Devin Global Customizations"
+      },
+      {
+        "command": "devinGlobalCustomizations.openGlobalFolder",
+        "title": "Devin: Open Global Customizations Folder",
+        "category": "Devin Global Customizations"
+      }
+    ],
     "chatAgents": [
       {
         "path": "./agents/global-planner.agent.md"

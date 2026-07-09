@@ -38,6 +38,12 @@ es útil para entornos que soportan extensiones VS Code pero todavía no muestra
 Agent Plugins; las actualizaciones deberán distribuirse como nuevas versiones
 de la extensión.
 
+Después de instalar el VSIX, usa la paleta de comandos y ejecuta
+`Devin: Install or Update Agents and Skills Globally`, o pulsa el botón
+`Devin Global` de la barra de estado. La extensión copiará `.devin/agents/` y
+`.devin/skills/` a `~/.config/devin/agents/` y `~/.config/devin/skills/`.
+En Windows usa `%APPDATA%/devin/agents/` y `%APPDATA%/devin/skills/`.
+
 Como alternativa para probar una copia local, configura la ruta del repositorio
 en `chat.pluginLocations`:
 

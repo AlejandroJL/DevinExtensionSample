@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.3] - 2026-07-09
+
+- Añadido el comando y botón `Devin: Install or Update Agents and Skills Globally`.
+- La extensión instala las definiciones en `~/.config/devin/agents` y
+  `~/.config/devin/skills`.
+
 ## [0.1.2] - 2026-07-09
 
 - Incluida la carpeta `.devin/` dentro del empaquetado VSIX.
