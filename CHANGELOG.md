@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.1] - 2026-07-09
+
+- Ajustada la ruta global de Cascade a `~/.codeium/windsurf/windsurf/`.
+- La fuente empaquetada de Cascade usa `.codeium/windsurf/windsurf/`.
+
 ## [0.2.0] - 2026-07-09
 
 - Añadida instalación global de skills compatibles con Cascade en

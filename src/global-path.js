@@ -27,7 +27,7 @@ function getGlobalCascadeRoot({
   homeDirectory = os.homedir(),
   pathApi = path,
 } = {}) {
-  return pathApi.join(homeDirectory, '.codeium', 'windsurf');
+  return pathApi.join(homeDirectory, '.codeium', 'windsurf', 'windsurf');
 }
 
 module.exports = { getGlobalCascadeRoot, getGlobalDevinRoot };

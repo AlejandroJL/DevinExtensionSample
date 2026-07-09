@@ -138,14 +138,15 @@ function validateDevinSkillMirror() {
 }
 
 function validateCascadeMirrors() {
-  const skillsPath = path.join(root, '.windsurf', 'skills');
-  const workflowsPath = path.join(root, '.windsurf', 'workflows');
+  const cascadeRoot = path.join(root, '.codeium', 'windsurf', 'windsurf');
+  const skillsPath = path.join(cascadeRoot, 'skills');
+  const workflowsPath = path.join(cascadeRoot, 'workflows');
 
   if (!fs.existsSync(skillsPath)) {
-    errors.push('Falta la estructura Cascade .windsurf/skills');
+    errors.push('Falta la estructura Cascade .codeium/windsurf/windsurf/skills');
   }
   if (!fs.existsSync(workflowsPath)) {
-    errors.push('Falta la estructura Cascade .windsurf/workflows');
+    errors.push('Falta la estructura Cascade .codeium/windsurf/windsurf/workflows');
   }
 
   for (const entry of fs.readdirSync(path.join(root, 'skills'), { withFileTypes: true })) {

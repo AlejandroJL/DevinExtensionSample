@@ -12,10 +12,9 @@ pueden estar disponibles en cualquier ventana o espacio de trabajo del IDE.
   `.devin/agents/<nombre>/AGENT.md`.
 - `.devin/skills/`: skills nativas de Devin, con formato
   `.devin/skills/<nombre>/SKILL.md`.
-- `.windsurf/skills/`: skills compatibles con Cascade, con formato
-  `.windsurf/skills/<nombre>/SKILL.md`.
-- `.windsurf/workflows/`: workflows de Cascade derivados de los agentes del
-  plugin.
+- `.codeium/windsurf/windsurf/skills/`: skills compatibles con Cascade.
+- `.codeium/windsurf/windsurf/workflows/`: workflows de Cascade derivados de
+  los agentes del plugin.
 - `plugin.json`: manifiesto del plugin y punto de entrada para la instalación
   desde Git.
 - `scripts/validate.mjs`: validación local del manifiesto y de los recursos.
@@ -51,10 +50,12 @@ Para Devin copia `.devin/agents/` y `.devin/skills/` a
 `~/.config/devin/agents/` y `~/.config/devin/skills/` en macOS/Linux. En
 Windows usa `%APPDATA%/devin/agents/` y `%APPDATA%/devin/skills/`.
 
-Para Cascade copia `.windsurf/skills/` a `~/.codeium/windsurf/skills/` y
-`.windsurf/workflows/` a `~/.codeium/windsurf/global_workflows/`. En Windows
-estas rutas se resuelven bajo el perfil del usuario, por ejemplo
-`C:\\Users\\<usuario>\\.codeium\\windsurf\\skills\\`.
+Para Cascade copia `.codeium/windsurf/windsurf/skills/` a
+`~/.codeium/windsurf/windsurf/skills/` y
+`.codeium/windsurf/windsurf/workflows/` a
+`~/.codeium/windsurf/windsurf/global_workflows/`. En Windows estas rutas se
+resuelven bajo el perfil del usuario, por ejemplo
+`C:\\Users\\<usuario>\\.codeium\\windsurf\\windsurf\\skills\\`.
 
 Por defecto, esa copia también se ejecuta automáticamente cuando la extensión
 se instala o se activa después de una actualización. Puedes desactivarla con
@@ -126,8 +127,9 @@ minúsculas, números y guiones.
 ## Alcance de Devin
 
 Devin puede descubrir las definiciones del proyecto bajo `.devin/agents/` y
-`.devin/skills/`. Cascade descubre las skills bajo `.windsurf/skills/` y los
-workflows bajo `.windsurf/workflows/`. Para disponer de los recursos entre
+`.devin/skills/`. Cascade descubre las skills bajo
+`.codeium/windsurf/windsurf/skills/` y los workflows bajo
+`.codeium/windsurf/windsurf/workflows/`. Para disponer de los recursos entre
 ventanas, instala el Agent Plugin y ejecuta la sincronización global de la
 extensión.
 

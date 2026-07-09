@@ -33,7 +33,7 @@ function installDevinGlobally(extensionRoot) {
 }
 
 function installCascadeGlobally(extensionRoot) {
-  const sourceRoot = path.join(extensionRoot, '.windsurf');
+  const sourceRoot = path.join(extensionRoot, '.codeium', 'windsurf', 'windsurf');
   const targetRoot = getGlobalCascadeRoot();
 
   copyDirectory(path.join(sourceRoot, 'skills'), path.join(targetRoot, 'skills'));
