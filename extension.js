@@ -8,8 +8,6 @@ const INSTALL_COMMAND = 'devinGlobalCustomizations.installGlobally';
 const OPEN_FOLDER_COMMAND = 'devinGlobalCustomizations.openGlobalFolder';
 const CHECK_UPDATES_COMMAND = 'devinGlobalCustomizations.checkForUpdates';
 const INSTALL_UPDATE_COMMAND = 'devinGlobalCustomizations.installUpdate';
-const CONFIGURE_TOKEN_COMMAND = 'devinGlobalCustomizations.configureGitHubToken';
-const CLEAR_TOKEN_COMMAND = 'devinGlobalCustomizations.clearGitHubToken';
 const GLOBAL_INSTALLATION_VERSION_KEY = 'globalInstallationVersion';
 
 function getGlobalDevinRoot() {
@@ -120,11 +118,7 @@ function activate(context) {
       await updater.checkForUpdates(context, { interactive: true, notify: true });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      const action = await vscode.window.showErrorMessage(
-        `No se pudieron comprobar las actualizaciones de Devin: ${message}`,
-        'Configurar token GitHub',
-      );
-      if (action === 'Configurar token GitHub') await vscode.commands.executeCommand(CONFIGURE_TOKEN_COMMAND);
+      vscode.window.showErrorMessage(`No se pudieron comprobar las actualizaciones web de Devin: ${message}`);
     }
   });
 
@@ -138,16 +132,11 @@ function activate(context) {
     }
   });
 
-  const configureToken = vscode.commands.registerCommand(CONFIGURE_TOKEN_COMMAND, () => updater.configureToken(context));
-  const clearToken = vscode.commands.registerCommand(CLEAR_TOKEN_COMMAND, () => updater.clearToken(context));
-
   context.subscriptions.push(
     install,
     openFolder,
     checkForUpdates,
     installUpdate,
-    configureToken,
-    clearToken,
   );
   createStatusBarItem(context);
   void installGlobalCustomizationsOnActivation(context);

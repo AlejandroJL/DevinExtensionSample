@@ -2,7 +2,7 @@
   "name": "devin-global-customizations",
   "displayName": "Devin Global Customizations",
   "description": "Agentes y skills globales para Devin Desktop y VS Code.",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "publisher": "devin-global-customizations",
   "license": "MIT",
   "main": "./extension.js",
@@ -40,16 +40,6 @@
         "command": "devinGlobalCustomizations.installUpdate",
         "title": "Devin: Download and Install Update",
         "category": "Devin Global Customizations"
-      },
-      {
-        "command": "devinGlobalCustomizations.configureGitHubToken",
-        "title": "Devin: Configure GitHub Token",
-        "category": "Devin Global Customizations"
-      },
-      {
-        "command": "devinGlobalCustomizations.clearGitHubToken",
-        "title": "Devin: Clear GitHub Token",
-        "category": "Devin Global Customizations"
       }
     ],
     "configuration": {
@@ -63,7 +53,7 @@
         "devinGlobalCustomizations.updates.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Check the GitHub Pages update manifest automatically."
+          "description": "Check the web update manifest automatically."
         },
         "devinGlobalCustomizations.updates.checkIntervalHours": {
           "type": "number",
@@ -75,7 +65,7 @@
         "devinGlobalCustomizations.updates.manifestUrl": {
           "type": "string",
           "default": "https://alejandrojl.github.io/DevinExtensionSample/updates/latest.json",
-          "description": "HTTPS URL of the static update manifest served by GitHub Pages."
+          "description": "HTTPS URL of the static update manifest served by the web."
         }
       }
     },

@@ -2,10 +2,10 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const https = require('node:https');
 
-function requestResource(url, token, responseType = 'json', redirects = 0) {
+function requestResource(url, responseType = 'json', redirects = 0) {
   return new Promise((resolve, reject) => {
     if (redirects > 5) {
-      reject(new Error('Demasiadas redirecciones al consultar GitHub Pages.'));
+      reject(new Error('Demasiadas redirecciones al consultar el servidor web.'));
       return;
     }
 
@@ -14,8 +14,6 @@ function requestResource(url, token, responseType = 'json', redirects = 0) {
       Accept: responseType === 'json' ? 'application/json' : 'application/octet-stream',
       'User-Agent': 'DevinGlobalCustomizations',
     };
-    if (token) headers.Authorization = `Bearer ${token}`;
-
     const clientRequest = https.get({
       protocol: requestUrl.protocol,
       hostname: requestUrl.hostname,
@@ -25,7 +23,7 @@ function requestResource(url, token, responseType = 'json', redirects = 0) {
     }, (response) => {
       if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location) {
         response.resume();
-        requestResource(new URL(response.headers.location, url).toString(), token, responseType, redirects + 1)
+        requestResource(new URL(response.headers.location, url).toString(), responseType, redirects + 1)
           .then(resolve)
           .catch(reject);
         return;
@@ -36,7 +34,7 @@ function requestResource(url, token, responseType = 'json', redirects = 0) {
         response.setEncoding('utf8');
         response.on('data', (chunk) => { body += chunk; });
         response.on('end', () => {
-          reject(new Error(`GitHub Pages respondió ${response.statusCode}: ${body.slice(0, 300)}`));
+          reject(new Error(`El servidor de actualización respondió ${response.statusCode}: ${body.slice(0, 300)}`));
         });
         return;
       }
@@ -62,12 +60,12 @@ function requestResource(url, token, responseType = 'json', redirects = 0) {
   });
 }
 
-function getUpdateManifest(url, token) {
-  return requestResource(url, token, 'json');
+function getUpdateManifest(url) {
+  return requestResource(url, 'json');
 }
 
-async function downloadAsset(url, destination, token) {
-  const response = await request(url, token, 'stream');
+async function downloadAsset(url, destination) {
+  const response = await requestResource(url, 'stream');
   await new Promise((resolve, reject) => {
     const output = fs.createWriteStream(destination);
     response.pipe(output);

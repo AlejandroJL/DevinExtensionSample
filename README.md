@@ -49,14 +49,14 @@ se instala o se activa después de una actualización. Puedes desactivarla con
 `devinGlobalCustomizations.installOnActivation` si prefieres sincronizar de
 forma manual.
 
-### Actualizaciones desde GitHub Pages
+### Actualizaciones web
 
 La extensión puede buscar actualizaciones manualmente con
 `Devin: Check for Updates` o automáticamente cada 24 horas. Para instalar una
 versión detectada usa `Devin: Download and Install Update` o el botón de la
 notificación.
 
-La extensión consulta por defecto:
+La extensión consulta por defecto el manifiesto web:
 
 ```text
 https://alejandrojl.github.io/DevinExtensionSample/updates/latest.json
@@ -69,15 +69,15 @@ SHA-256 antes de instalar el VSIX.
 Los recursos publicados se encuentran bajo `/updates/`: `latest.json`, el VSIX
 y una página informativa.
 
-El workflow de GitHub Actions incluido en `.github/workflows/pages.yml` genera
+El workflow de publicación incluido en `.github/workflows/pages.yml` genera
 el manifiesto y publica el VSIX en GitHub Pages en cada cambio de `main`. Hay
 que seleccionar `GitHub Actions` como origen en Settings → Pages la primera
 vez. GitHub Pages puede publicar contenido de repositorios privados solo cuando
 el plan de la cuenta lo permite.
 
-Si la Page requiere autenticación, la extensión intenta usar la sesión GitHub
-del IDE. También puedes usar `Devin: Configure GitHub Token`; el token queda
-guardado en el almacenamiento seguro de VS Code. No se usa GitHub CLI.
+El cliente no usa la API de GitHub, GitHub CLI ni autenticación de GitHub. Si se
+usa otro servidor HTTPS, basta con cambiar
+`devinGlobalCustomizations.updates.manifestUrl`.
 
 Como alternativa para probar una copia local, configura la ruta del repositorio
 en `chat.pluginLocations`:

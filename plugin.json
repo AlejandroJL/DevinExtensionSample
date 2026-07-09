@@ -1,7 +1,7 @@
 {
   "name": "devin-global-customizations",
   "description": "Agentes y skills globales para trabajar con Devin Desktop y VS Code.",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "author": {
     "name": "Devin Global Customizations contributors"
   },

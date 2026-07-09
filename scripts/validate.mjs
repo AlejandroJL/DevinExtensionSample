@@ -75,8 +75,6 @@ if (extensionManifest) {
     'devinGlobalCustomizations.installGlobally',
     'devinGlobalCustomizations.checkForUpdates',
     'devinGlobalCustomizations.installUpdate',
-    'devinGlobalCustomizations.configureGitHubToken',
-    'devinGlobalCustomizations.clearGitHubToken',
   ]) {
     if (!(extensionManifest.contributes?.commands ?? []).some((entry) => entry.command === command)) {
       errors.push(`package.json no declara el comando ${command}`);

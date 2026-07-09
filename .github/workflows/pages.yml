@@ -52,7 +52,7 @@ jobs:
             fileName: process.env.VSIX_FILE,
             downloadUrl: `${baseUrl}/updates/${process.env.VSIX_FILE}`,
             sha256: process.env.SHA256,
-            releaseNotesUrl: `https://github.com/${process.env.REPOSITORY}/commits/main`,
+            releaseNotesUrl: `${baseUrl}/updates/`,
             sourceRevision: process.env.COMMIT_SHA,
           };
           fs.writeFileSync('_site/index.html', '<!doctype html><title>Devin Global Customizations</title>');

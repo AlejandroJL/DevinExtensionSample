@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.8] - 2026-07-09
+
+- El actualizador usa únicamente HTTPS y el manifiesto web configurado.
+- Eliminadas la autenticación y las referencias GitHub del cliente de la extensión.
+
 ## [0.1.7] - 2026-07-09
 
 - Instalación automática de agentes y skills al activar, instalar o actualizar la extensión.

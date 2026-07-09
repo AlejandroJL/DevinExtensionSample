@@ -8,7 +8,6 @@ const {
   sha256File,
 } = require('./update-manifest');
 
-const TOKEN_SECRET_KEY = 'githubPagesToken';
 const LAST_CHECK_KEY = 'lastUpdateCheck';
 
 function parseVersion(value) {
@@ -37,26 +36,6 @@ function getUpdateManifestUrl() {
     .get('manifestUrl');
 }
 
-async function getToken(context, interactive) {
-  const storedToken = await context.secrets.get(TOKEN_SECRET_KEY);
-  if (storedToken) return storedToken;
-
-  if (vscode.authentication?.getSession) {
-    try {
-      const session = await vscode.authentication.getSession(
-        'github',
-        ['repo'],
-        { createIfNone: interactive },
-      );
-      if (session?.accessToken) return session.accessToken;
-    } catch {
-      // The Pages manifest can be public; authentication is optional.
-    }
-  }
-
-  return null;
-}
-
 function validateUpdateManifest(updateManifest, packageName) {
   if (updateManifest.name && updateManifest.name !== packageName) {
     throw new Error(`El manifiesto pertenece a ${updateManifest.name}, no a ${packageName}.`);
@@ -72,22 +51,15 @@ function validateUpdateManifest(updateManifest, packageName) {
   }
 }
 
-async function fetchManifest(context, interactive) {
+async function fetchManifest() {
   const manifestUrl = getUpdateManifestUrl();
   if (!manifestUrl) throw new Error('No hay una URL de manifiesto configurada.');
-
-  try {
-    return { manifestUrl, token: null, updateManifest: await getUpdateManifest(manifestUrl) };
-  } catch (publicRequestError) {
-    const token = await getToken(context, interactive);
-    if (!token) throw publicRequestError;
-    return { manifestUrl, token, updateManifest: await getUpdateManifest(manifestUrl, token) };
-  }
+  return { manifestUrl, updateManifest: await getUpdateManifest(manifestUrl) };
 }
 
 async function checkForUpdates(context, { interactive = false, notify = true } = {}) {
   const extensionManifest = getManifest(context.extensionPath);
-  const { manifestUrl, token, updateManifest } = await fetchManifest(context, interactive);
+  const { manifestUrl, updateManifest } = await fetchManifest();
   validateUpdateManifest(updateManifest, extensionManifest.name);
 
   if (compareVersions(updateManifest.version, extensionManifest.version) <= 0) {
@@ -99,7 +71,7 @@ async function checkForUpdates(context, { interactive = false, notify = true } =
     return null;
   }
 
-  const update = { extensionManifest, manifestUrl, token, updateManifest };
+  const update = { extensionManifest, manifestUrl, updateManifest };
   await context.globalState.update('latestUpdate', {
     version: updateManifest.version,
     manifestUrl,
@@ -122,14 +94,13 @@ async function checkForUpdates(context, { interactive = false, notify = true } =
 }
 
 async function installUpdate(context, update) {
-  const token = update.token || await getToken(context, true);
   const fileName = update.updateManifest.fileName
     || `devin-global-customizations-${update.updateManifest.version}.vsix`;
   const temporaryDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'devin-global-update-'));
   const vsixPath = path.join(temporaryDirectory, fileName);
 
   try {
-    await downloadAsset(update.updateManifest.downloadUrl, vsixPath, token);
+    await downloadAsset(update.updateManifest.downloadUrl, vsixPath);
     const actualDigest = await sha256File(vsixPath);
     const expectedDigest = update.updateManifest.sha256.toLowerCase();
     if (actualDigest !== expectedDigest) {
@@ -145,23 +116,6 @@ async function installUpdate(context, update) {
   } finally {
     fs.rmSync(temporaryDirectory, { recursive: true, force: true });
   }
-}
-
-async function configureToken(context) {
-  const token = await vscode.window.showInputBox({
-    ignoreFocusOut: true,
-    password: true,
-    prompt: 'Token GitHub con acceso de lectura a la GitHub Page protegida',
-    placeHolder: 'github_pat_…',
-  });
-  if (!token) return;
-  await context.secrets.store(TOKEN_SECRET_KEY, token.trim());
-  vscode.window.showInformationMessage('Token de GitHub Pages guardado de forma segura.');
-}
-
-async function clearToken(context) {
-  await context.secrets.delete(TOKEN_SECRET_KEY);
-  vscode.window.showInformationMessage('Token de GitHub Pages eliminado de la extensión.');
 }
 
 async function autoCheck(context) {
@@ -183,7 +137,5 @@ async function autoCheck(context) {
 module.exports = {
   autoCheck,
   checkForUpdates,
-  clearToken,
-  configureToken,
   installUpdate,
 };
