@@ -5,6 +5,10 @@
   "version": "0.1.0",
   "publisher": "devin-global-customizations",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AlejandroJL/DevinExtensionSample.git"
+  },
   "engines": {
     "vscode": "^1.100.0"
   },
