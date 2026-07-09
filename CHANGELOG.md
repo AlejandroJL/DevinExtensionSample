@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.5.1] - 2026-07-10
+
+- Añadido un icono propio en la Activity Bar de VS Code/Windsurf.
+- El icono abre el panel de información con `Usage`, `Agents` y `Skills`.
+
 ## [0.5.0] - 2026-07-10
 
 - Sustituida la vista del Explorer por un icono en el encabezado del editor.

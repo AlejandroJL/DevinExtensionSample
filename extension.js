@@ -13,6 +13,7 @@ const OPEN_FOLDER_COMMAND = 'devinGlobalCustomizations.openGlobalFolder';
 const CHECK_UPDATES_COMMAND = 'devinGlobalCustomizations.checkForUpdates';
 const INSTALL_UPDATE_COMMAND = 'devinGlobalCustomizations.installUpdate';
 const OPEN_CUSTOMIZATIONS_COMMAND = 'devinGlobalCustomizations.openCustomizations';
+const CUSTOMIZATIONS_VIEW_ID = 'devinGlobalCustomizations.infoView';
 const GLOBAL_INSTALLATION_VERSION_KEY = 'globalInstallationVersion';
 
 let customizationsPanel;
@@ -126,6 +127,17 @@ function openCustomizationsPanel(extensionRoot) {
   });
 }
 
+class CustomizationsWebviewViewProvider {
+  constructor(extensionRoot) {
+    this.extensionRoot = extensionRoot;
+  }
+
+  resolveWebviewView(webviewView) {
+    webviewView.webview.options = { enableScripts: false };
+    webviewView.webview.html = createCustomizationsHtml(this.extensionRoot);
+  }
+}
+
 function installGlobally(extensionRoot) {
   return buildCustomizationTargets(extensionRoot, {
     cascadeRoot: getGlobalCascadeRoot(),
@@ -208,6 +220,10 @@ function activate(context) {
     OPEN_CUSTOMIZATIONS_COMMAND,
     () => openCustomizationsPanel(context.extensionPath),
   );
+  const customizationsView = vscode.window.registerWebviewViewProvider(
+    CUSTOMIZATIONS_VIEW_ID,
+    new CustomizationsWebviewViewProvider(context.extensionPath),
+  );
 
   const checkForUpdates = vscode.commands.registerCommand(CHECK_UPDATES_COMMAND, async () => {
     try {
@@ -232,6 +248,7 @@ function activate(context) {
     install,
     openFolder,
     openCustomizations,
+    customizationsView,
     checkForUpdates,
     installUpdate,
   );

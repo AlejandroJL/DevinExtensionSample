@@ -57,9 +57,10 @@ se instala o se activa después de una actualización. Puedes desactivarla con
 `devinGlobalCustomizations.installOnActivation` si prefieres sincronizar de
 forma manual.
 
-El icono de libro `Devin/Cascade: Open Customizations` aparece en el encabezado
-del editor. Al pulsarlo abre un panel con las secciones `Usage`, `Agents` y
-`Skills`, incluyendo las descripciones y definiciones actuales.
+El icono de Devin & Cascade aparece en la Activity Bar. Al pulsarlo abre un
+panel con las secciones `Usage`, `Agents` y `Skills`, incluyendo las
+descripciones y definiciones actuales. También puedes usar el comando
+`Devin/Cascade: Open Customizations` desde la paleta.
 
 ### Actualizaciones web
 
