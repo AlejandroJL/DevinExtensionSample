@@ -76,6 +76,35 @@ function validateMarkdown(relativePath, expectedName, extension) {
   }
 }
 
+function validateDevinSkillMirror() {
+  const sourcePath = path.join(root, 'skills');
+  const targetPath = path.join(root, '.devin', 'skills');
+  if (!fs.existsSync(sourcePath)) return;
+
+  for (const entry of fs.readdirSync(sourcePath, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const expectedFile = path.join(targetPath, entry.name, 'SKILL.md');
+    if (!fs.existsSync(expectedFile)) {
+      errors.push(`Falta la definición Devin ${path.relative(root, expectedFile)}`);
+    }
+  }
+}
+
+function validateDevinAgentMirror() {
+  const sourcePath = path.join(root, 'agents');
+  const targetPath = path.join(root, '.devin', 'agents');
+  if (!fs.existsSync(sourcePath)) return;
+
+  for (const entry of fs.readdirSync(sourcePath)) {
+    if (!entry.endsWith('.agent.md')) continue;
+    const agentName = entry.replace(/\.agent\.md$/, '');
+    const expectedFile = path.join(targetPath, agentName, 'AGENT.md');
+    if (!fs.existsSync(expectedFile)) {
+      errors.push(`Falta la definición Devin ${path.relative(root, expectedFile)}`);
+    }
+  }
+}
+
 for (const directory of ['agents', 'skills']) {
   const directoryPath = path.join(root, directory);
   if (!fs.existsSync(directoryPath)) {
@@ -107,6 +136,9 @@ if (fs.existsSync(agentsPath)) {
     validateMarkdown(`agents/${entry}`, entry.replace(/\.agent\.md$/, ''), '.agent.md');
   }
 }
+
+validateDevinAgentMirror();
+validateDevinSkillMirror();
 
 if (errors.length > 0) {
   console.error(errors.map((error) => `- ${error}`).join('\n'));

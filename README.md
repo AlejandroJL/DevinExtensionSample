@@ -8,6 +8,10 @@ pueden estar disponibles en cualquier ventana o espacio de trabajo del IDE.
 
 - `agents/`: agentes personalizados (`*.agent.md`).
 - `skills/`: skills compatibles con el estándar Agent Skills (`SKILL.md`).
+- `.devin/agents/`: agentes nativos de Devin, con formato
+  `.devin/agents/<nombre>/AGENT.md`.
+- `.devin/skills/`: skills nativas de Devin, con formato
+  `.devin/skills/<nombre>/SKILL.md`.
 - `plugin.json`: manifiesto del plugin y punto de entrada para la instalación
   desde Git.
 - `scripts/validate.mjs`: validación local del manifiesto y de los recursos.
@@ -68,11 +72,11 @@ minúsculas, números y guiones.
 
 ## Alcance de Devin
 
-Devin descubre skills guardadas en repositorios conectados mediante
-`.agents/skills/`, pero ese mecanismo es distinto del alcance global del plugin
-instalado en el IDE. Este repositorio usa el formato de Agent Plugin para que
-los agentes y skills se instalen en el perfil del usuario y puedan compartirse
-entre ventanas.
+Devin puede descubrir las definiciones del proyecto bajo `.devin/agents/` y
+`.devin/skills/`. La instalación global del CLI usa las rutas de usuario
+`~/.config/devin/agents/` y `~/.config/devin/skills/`; esas rutas no se escriben
+desde el repositorio. Para disponer de los recursos entre ventanas, instala el
+Agent Plugin en el perfil del IDE.
 
 ## Licencia
 
