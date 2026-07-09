@@ -10,6 +10,7 @@ const CHECK_UPDATES_COMMAND = 'devinGlobalCustomizations.checkForUpdates';
 const INSTALL_UPDATE_COMMAND = 'devinGlobalCustomizations.installUpdate';
 const CONFIGURE_TOKEN_COMMAND = 'devinGlobalCustomizations.configureGitHubToken';
 const CLEAR_TOKEN_COMMAND = 'devinGlobalCustomizations.clearGitHubToken';
+const GLOBAL_INSTALLATION_VERSION_KEY = 'globalInstallationVersion';
 
 function getGlobalDevinRoot() {
   if (process.platform === 'win32') {
@@ -36,6 +37,44 @@ function installGlobally(extensionRoot) {
   copyDirectory(path.join(sourceRoot, 'skills'), path.join(targetRoot, 'skills'));
 
   return targetRoot;
+}
+
+function getExtensionVersion(extensionRoot) {
+  const packageJson = JSON.parse(fs.readFileSync(path.join(extensionRoot, 'package.json'), 'utf8'));
+  return packageJson.version;
+}
+
+async function installGlobalCustomizationsOnActivation(context) {
+  const configuration = vscode.workspace.getConfiguration('devinGlobalCustomizations');
+  if (!configuration.get('installOnActivation', true)) return;
+
+  const version = getExtensionVersion(context.extensionPath);
+  const targetRoot = getGlobalDevinRoot();
+  const installedVersion = context.globalState.get(GLOBAL_INSTALLATION_VERSION_KEY);
+  const targetExists = fs.existsSync(path.join(targetRoot, 'agents'))
+    && fs.existsSync(path.join(targetRoot, 'skills'));
+
+  if (installedVersion === version && targetExists) return;
+
+  try {
+    installGlobally(context.extensionPath);
+    await context.globalState.update(GLOBAL_INSTALLATION_VERSION_KEY, version);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    const action = await vscode.window.showWarningMessage(
+      `No se pudieron instalar automáticamente los agentes y skills de Devin: ${message}`,
+      'Reintentar ahora',
+    );
+    if (action === 'Reintentar ahora') {
+      try {
+        installGlobally(context.extensionPath);
+        await context.globalState.update(GLOBAL_INSTALLATION_VERSION_KEY, version);
+      } catch (retryError) {
+        const retryMessage = retryError instanceof Error ? retryError.message : String(retryError);
+        vscode.window.showErrorMessage(`La instalación automática sigue fallando: ${retryMessage}`);
+      }
+    }
+  }
 }
 
 function createStatusBarItem(context) {
@@ -111,6 +150,7 @@ function activate(context) {
     clearToken,
   );
   createStatusBarItem(context);
+  void installGlobalCustomizationsOnActivation(context);
   void updater.autoCheck(context);
 }
 

@@ -44,6 +44,11 @@ Después de instalar el VSIX, usa la paleta de comandos y ejecuta
 `.devin/skills/` a `~/.config/devin/agents/` y `~/.config/devin/skills/`.
 En Windows usa `%APPDATA%/devin/agents/` y `%APPDATA%/devin/skills/`.
 
+Por defecto, esa copia también se ejecuta automáticamente cuando la extensión
+se instala o se activa después de una actualización. Puedes desactivarla con
+`devinGlobalCustomizations.installOnActivation` si prefieres sincronizar de
+forma manual.
+
 ### Actualizaciones desde GitHub Pages
 
 La extensión puede buscar actualizaciones manualmente con

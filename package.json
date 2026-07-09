@@ -2,7 +2,7 @@
   "name": "devin-global-customizations",
   "displayName": "Devin Global Customizations",
   "description": "Agentes y skills globales para Devin Desktop y VS Code.",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "publisher": "devin-global-customizations",
   "license": "MIT",
   "main": "./extension.js",
@@ -55,6 +55,11 @@
     "configuration": {
       "title": "Devin Global Customizations",
       "properties": {
+        "devinGlobalCustomizations.installOnActivation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Install or update Devin agents and skills globally when the extension is installed or updated."
+        },
         "devinGlobalCustomizations.updates.enabled": {
           "type": "boolean",
           "default": true,

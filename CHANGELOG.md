@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.7] - 2026-07-09
+
+- Instalación automática de agentes y skills al activar, instalar o actualizar la extensión.
+- Añadida la opción `devinGlobalCustomizations.installOnActivation` para desactivar este comportamiento.
+
 ## [0.1.6] - 2026-07-09
 
 - Añadido el agente experimental `random-orbit` para probar la actualización.
