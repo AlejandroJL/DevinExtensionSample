@@ -2,7 +2,7 @@
   "name": "devin-global-customizations",
   "displayName": "Devin Global Customizations",
   "description": "Agentes y skills globales para Devin Desktop y VS Code.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "devin-global-customizations",
   "license": "MIT",
   "repository": {

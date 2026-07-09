@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.2] - 2026-07-09
+
+- Incluida la carpeta `.devin/` dentro del empaquetado VSIX.
+
 ## [0.1.1] - 2026-07-09
 
 - Añadida la estructura nativa `.devin/agents/` y `.devin/skills/` para Devin.
