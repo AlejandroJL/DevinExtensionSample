@@ -114,10 +114,11 @@ minúsculas, números y guiones.
 ## Alcance de Devin
 
 Devin puede descubrir las definiciones del proyecto bajo `.devin/agents/` y
-`.devin/skills/`. La instalación global del CLI usa las rutas de usuario
-`~/.config/devin/agents/` y `~/.config/devin/skills/`; esas rutas no se escriben
-desde el repositorio. Para disponer de los recursos entre ventanas, instala el
-Agent Plugin en el perfil del IDE.
+`.devin/skills/`. La instalación global usa `~/.config/devin/agents/` y
+`~/.config/devin/skills/` en macOS/Linux, y `%APPDATA%\\devin\\agents\\` y
+`%APPDATA%\\devin\\skills\\` en Windows; esas rutas no se escriben desde el
+repositorio. Para disponer de los recursos entre ventanas, instala el Agent
+Plugin en el perfil del IDE.
 
 ## Licencia
 

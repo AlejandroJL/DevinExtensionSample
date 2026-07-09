@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.10] - 2026-07-09
+
+- Añadida resolución de rutas globales compatible con macOS, Linux y Windows.
+- En Windows los agentes y skills se instalan en `%APPDATA%\\devin`.
+- Añadidas pruebas para la ruta de configuración de cada sistema operativo.
+
 ## [0.1.9] - 2026-07-09
 
 - Añadido el agente de ejemplo `update-sentinel` para verificar actualizaciones.

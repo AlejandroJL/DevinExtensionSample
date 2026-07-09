@@ -1,22 +1,14 @@
 const fs = require('node:fs');
-const os = require('node:os');
 const path = require('node:path');
 const vscode = require('vscode');
 const updater = require('./src/updater');
+const { getGlobalDevinRoot } = require('./src/global-path');
 
 const INSTALL_COMMAND = 'devinGlobalCustomizations.installGlobally';
 const OPEN_FOLDER_COMMAND = 'devinGlobalCustomizations.openGlobalFolder';
 const CHECK_UPDATES_COMMAND = 'devinGlobalCustomizations.checkForUpdates';
 const INSTALL_UPDATE_COMMAND = 'devinGlobalCustomizations.installUpdate';
 const GLOBAL_INSTALLATION_VERSION_KEY = 'globalInstallationVersion';
-
-function getGlobalDevinRoot() {
-  if (process.platform === 'win32') {
-    return path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), 'devin');
-  }
-
-  return path.join(os.homedir(), '.config', 'devin');
-}
 
 function copyDirectory(source, target) {
   if (!fs.existsSync(source)) {
