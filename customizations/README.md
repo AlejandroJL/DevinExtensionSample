@@ -8,4 +8,4 @@ La extensión construye desde aquí los formatos que necesita cada IDE:
 - `skills/`: skills compartidas por Devin y Windsurf.
 - `workflows/`: workflows adicionales de Windsurf.
 - `rules/`: reglas globales de Windsurf.
-- `USAGE.md`: guía que se muestra en la vista de árbol de la extensión.
+- `USAGE.md`: guía que se muestra en el panel informativo de la extensión.

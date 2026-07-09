@@ -2,7 +2,7 @@
   "name": "devin-global-customizations",
   "displayName": "Devin Global Customizations",
   "description": "Agentes y skills globales para Devin Desktop y VS Code.",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "publisher": "devin-global-customizations",
   "license": "MIT",
   "main": "./extension.js",
@@ -40,6 +40,12 @@
         "command": "devinGlobalCustomizations.installUpdate",
         "title": "Devin: Download and Install Update",
         "category": "Devin Global Customizations"
+      },
+      {
+        "command": "devinGlobalCustomizations.openCustomizations",
+        "title": "Devin/Cascade: Open Customizations",
+        "category": "Devin Global Customizations",
+        "icon": "$(book)"
       }
     ],
     "configuration": {
@@ -91,11 +97,17 @@
         "path": "./customizations/skills/safe-release/SKILL.md"
       }
     ],
-    "views": {
-      "explorer": [
+    "menus": {
+      "editor/title": [
         {
-          "id": "devinGlobalCustomizations.customizations",
-          "name": "Devin & Cascade Customizations"
+          "command": "devinGlobalCustomizations.openCustomizations",
+          "group": "navigation@1"
+        }
+      ],
+      "commandCenter": [
+        {
+          "command": "devinGlobalCustomizations.openCustomizations",
+          "group": "navigation@1"
         }
       ]
     }

@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.5.0] - 2026-07-10
+
+- Sustituida la vista del Explorer por un icono en el encabezado del editor.
+- El icono abre un panel organizado en `Usage`, `Agents` y `Skills`.
+
 ## [0.4.0] - 2026-07-09
 
 - Eliminada la barra de estado de la extensión.
