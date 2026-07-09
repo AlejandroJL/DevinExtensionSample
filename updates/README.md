@@ -8,4 +8,4 @@ la extensión:
 
 El workflow `.github/workflows/pages.yml` genera y publica el `latest.json` y el
 VSIX más reciente en esta misma ruta. El fichero versionado sirve como
-referencia local y fallback mientras se ejecuta el workflow.
+referencia local para validación y desarrollo.

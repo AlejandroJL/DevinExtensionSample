@@ -14,7 +14,6 @@ function read(relativePath) {
   return fs.readFileSync(absolutePath, 'utf8');
 }
 
-const manifestPath = path.join(root, 'plugin.json');
 let manifest;
 try {
   manifest = JSON.parse(read('plugin.json'));

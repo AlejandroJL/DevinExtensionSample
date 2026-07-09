@@ -129,6 +129,4 @@ function buildCustomizationTargets(extensionRoot, { cascadeRoot, devinRoot }) {
 
 module.exports = {
   buildCustomizationTargets,
-  parseFrontmatter,
-  writeCascadeWorkflow,
 };
